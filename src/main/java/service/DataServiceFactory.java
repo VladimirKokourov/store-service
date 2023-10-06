@@ -11,8 +11,8 @@ import java.util.List;
 
 public class DataServiceFactory {
 
-    public static final String SEARCH = "search";
-    public static final String STAT = "stat";
+    private static final String SEARCH = "search";
+    private static final String STAT = "stat";
 
     public static DataService getDataService(String command, String inputFilePath,
                                              String outputFilePath, Repository repository) {
