@@ -31,7 +31,7 @@ public class StatCustomersDataService implements DataService {
     public void printResult() {
         Path path = Paths.get(outputFilePath);
 
-        int totalDays = DateUtil.getNumberDaysWithoutWeekends(startDate, endDate);
+        int totalDays = DateUtil.countWeekDays(startDate, endDate);
         List<CustomerPurchaseStat> customers = repository.getCustomerPurchaseStats(startDate, endDate);
         BigDecimal totalExpenses = customers.stream()
                 .map(CustomerPurchaseStat::getTotalExpenses)
