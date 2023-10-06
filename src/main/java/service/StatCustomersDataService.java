@@ -3,7 +3,9 @@ package service;
 import dao.Repository;
 import exception.WriteToFileException;
 import lombok.AllArgsConstructor;
+import pojo.output.search.Customer;
 import pojo.output.stat.CustomerPurchaseStat;
+import pojo.output.stat.Purchase;
 import pojo.output.stat.StatResult;
 import util.DateUtil;
 import util.JsonUtil;
@@ -17,7 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 public class StatCustomersDataService implements DataService {
@@ -32,17 +36,33 @@ public class StatCustomersDataService implements DataService {
         Path path = Paths.get(outputFilePath);
 
         int totalDays = DateUtil.countWeekDays(startDate, endDate);
-        List<CustomerPurchaseStat> customers = repository.getCustomerPurchaseStats(startDate, endDate);
-        BigDecimal totalExpenses = customers.stream()
+        Map<Customer, List<Purchase>> customers = repository.getCustomerPurchaseStats(startDate, endDate);
+
+        List<CustomerPurchaseStat> customersList = new ArrayList<>();
+
+        for (Customer customer : customers.keySet()) {
+            CustomerPurchaseStat stat = new CustomerPurchaseStat();
+            stat.setName(customer.getLastName() + " " + customer.getFirstName());
+            stat.setPurchases(customers.get(customer));
+            stat.setTotalExpenses();
+            customersList.add(stat);
+        }
+
+        BigDecimal totalExpenses = customersList.stream()
                 .map(CustomerPurchaseStat::getTotalExpenses)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal avgExpenses = totalExpenses.divide(BigDecimal.valueOf(customers.size()),
-                18, RoundingMode.CEILING);
+        BigDecimal avgExpenses;
+        if (!totalExpenses.equals(BigDecimal.ZERO)) {
+            avgExpenses = totalExpenses.divide(BigDecimal.valueOf(customers.size()),
+                    2, RoundingMode.CEILING);
+        } else {
+            avgExpenses = BigDecimal.ZERO;
+        }
 
         StatResult result = new StatResult();
         result.setType("stat");
         result.setTotalDays(totalDays);
-        result.setCustomers(customers);
+        result.setCustomers(customersList);
         result.setTotalExpenses(totalExpenses);
         result.setAvgExpenses(avgExpenses);
 
