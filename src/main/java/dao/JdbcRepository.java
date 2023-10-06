@@ -15,9 +15,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class JdbcRepository implements Repository {
-    private static String url;
-    private static String user;
-    private static String password;
 
     public Connection connect() {
         Properties properties = new Properties();
@@ -31,9 +28,9 @@ public class JdbcRepository implements Repository {
             throw new FileReadException("Ошибка чтения config.properties");
         }
 
-        url = properties.getProperty("url");
-        user = properties.getProperty("user");
-        password = properties.getProperty("password");
+        String url = properties.getProperty("url");
+        String user = properties.getProperty("user");
+        String password = properties.getProperty("password");
 
         Connection connection;
         try {
