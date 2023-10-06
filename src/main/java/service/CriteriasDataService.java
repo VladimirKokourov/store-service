@@ -32,7 +32,7 @@ public class CriteriasDataService implements DataService {
             for (Criteria criteria : criterias) {
                 bw.append(JsonUtil.writeJson(criteria.getResult(repository)));
             }
-            bw.write(END);
+            bw.append(END);
         } catch (IOException e) {
             throw new WriteToFileException("Ошибка записи в файл");
         }

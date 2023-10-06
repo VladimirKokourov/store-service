@@ -3,6 +3,8 @@ package pojo.input.search.criteria;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import dao.Repository;
+import pojo.output.search.SearchResult;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
 @JsonSubTypes({
@@ -12,4 +14,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(BadCustomersCriteria.class),
 })
 public abstract class Criteria {
+
+    public abstract SearchResult getResult(Repository repository);
 }
