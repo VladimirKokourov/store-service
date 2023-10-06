@@ -1,14 +1,17 @@
 package dao;
 
+import exception.ApplicationException;
 import exception.ReadSQLException;
 import pojo.output.search.Customer;
 import pojo.output.stat.Purchase;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JdbcRepository implements Repository {
     private static String url = "jdbc:postgresql://localhost/test";
@@ -16,13 +19,13 @@ public class JdbcRepository implements Repository {
     private static String password = "daster88";
 
     public Connection connect() {
-        Connection connection = null;
+        Connection connection;
         try {
             connection = DriverManager.getConnection(url, user, password);
-            System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
-            e.getStackTrace();
+            throw new ApplicationException("Ошибка подключения к БД");
         }
+
         return connection;
     }
 

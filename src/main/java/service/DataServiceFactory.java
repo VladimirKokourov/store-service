@@ -1,6 +1,7 @@
 package service;
 
 import dao.Repository;
+import exception.ApplicationException;
 import exception.UnknownCommandException;
 import pojo.input.search.SearchRequestRoot;
 import pojo.input.search.criteria.Criteria;
@@ -16,17 +17,21 @@ public class DataServiceFactory {
 
     public static DataService getDataService(String command, String inputFilePath,
                                              String outputFilePath, Repository repository) {
-        switch (command) {
-            case SEARCH :
-                SearchRequestRoot searchRequestRoot = (SearchRequestRoot) JsonUtil.readJson(inputFilePath);
-                List<Criteria> criterias = searchRequestRoot.getCriterias();
-                return new CriteriasDataService(criterias, repository, outputFilePath);
-            case STAT:
-                StatRequestRoot statRequestRoot = (StatRequestRoot) JsonUtil.readJson(inputFilePath);
-                return new StatCustomersDataService(statRequestRoot.getStartDate(), statRequestRoot.getEndDate(),
-                        repository, outputFilePath);
-            default:
-                throw new UnknownCommandException("Неизвестная команда: " + command);
+        try {
+            switch (command) {
+                case SEARCH:
+                    SearchRequestRoot searchRequestRoot = (SearchRequestRoot) JsonUtil.readJson(inputFilePath);
+                    List<Criteria> criterias = searchRequestRoot.getCriterias();
+                    return new CriteriasDataService(criterias, repository, outputFilePath);
+                case STAT:
+                    StatRequestRoot statRequestRoot = (StatRequestRoot) JsonUtil.readJson(inputFilePath);
+                    return new StatCustomersDataService(statRequestRoot.getStartDate(), statRequestRoot.getEndDate(),
+                            repository, outputFilePath);
+                default:
+                    throw new UnknownCommandException("Неизвестная команда: " + command);
+            }
+        } catch (ClassCastException e) {
+            throw new ApplicationException("Команда не соответсвует входному файлу: " + command);
         }
     }
 }
