@@ -1,24 +1,40 @@
 package dao;
 
 import exception.ApplicationException;
+import exception.FileReadException;
 import exception.ReadSQLException;
 import pojo.output.search.Customer;
 import pojo.output.stat.Purchase;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JdbcRepository implements Repository {
-    private static String url = "jdbc:postgresql://localhost/test";
-    private static String user = "postgres";
-    private static String password = "daster88";
+    private static String url;
+    private static String user;
+    private static String password;
 
     public Connection connect() {
+        Properties properties = new Properties();
+
+        try (InputStream input = JdbcRepository.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                throw new ApplicationException("Файл config.properties не найден");
+            }
+            properties.load(input);
+        } catch (IOException ex) {
+            throw new FileReadException("Ошибка чтения config.properties");
+        }
+
+        url = properties.getProperty("url");
+        user = properties.getProperty("user");
+        password = properties.getProperty("password");
+
         Connection connection;
         try {
             connection = DriverManager.getConnection(url, user, password);
