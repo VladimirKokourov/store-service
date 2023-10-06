@@ -12,12 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class StatResult {
+public class CustomerPurchaseStat {
 
-    private String type;
-    private int totalDays;
-    List<CustomerPurchaseStat> customers;
+    private String name;
+    private List<Purchase> purchases;
     private BigDecimal totalExpenses;
-    private BigDecimal avgExpenses;
-
 }
