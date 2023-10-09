@@ -31,6 +31,9 @@ public class CriteriasDataService implements DataService {
             bw.write(BEGIN);
             for (Criteria criteria : criterias) {
                 bw.append(JsonUtil.writeJson(criteria.getResult(repository)));
+                if (!(criterias.lastIndexOf(criteria) == criterias.size() - 1)) {
+                    bw.append(",");
+                }
             }
             bw.append(END);
         } catch (IOException e) {
