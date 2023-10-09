@@ -26,6 +26,7 @@ public class StoreDataApplication {
             ArgsValidator.validate(args);
         } catch (ApplicationException e) {
             System.out.println(e.getMessage());
+            System.exit(0);
         }
 
         String inputCommand = args[0].toLowerCase();
