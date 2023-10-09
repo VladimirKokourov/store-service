@@ -33,17 +33,14 @@ public class StatCustomersDataService implements DataService {
 
     @Override
     public void printResult() {
-        Path path = Paths.get(outputFilePath);
-
         int totalDays = DateUtil.countWeekDays(startDate, endDate);
-        Map<Customer, List<Purchase>> customers = repository.getCustomerPurchaseStats(startDate, endDate);
 
+        Map<Customer, List<Purchase>> customersMap = repository.getCustomerPurchaseStats(startDate, endDate);
         List<CustomerPurchaseStat> customersList = new ArrayList<>();
-
-        for (Customer customer : customers.keySet()) {
+        for (Customer customer : customersMap.keySet()) {
             CustomerPurchaseStat stat = new CustomerPurchaseStat();
             stat.setName(customer.getLastName() + " " + customer.getFirstName());
-            stat.setPurchases(customers.get(customer));
+            stat.setPurchases(customersMap.get(customer));
             stat.setTotalExpenses();
             customersList.add(stat);
         }
@@ -51,21 +48,23 @@ public class StatCustomersDataService implements DataService {
         BigDecimal totalExpenses = customersList.stream()
                 .map(CustomerPurchaseStat::getTotalExpenses)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         BigDecimal avgExpenses;
-        if (!totalExpenses.equals(BigDecimal.ZERO)) {
-            avgExpenses = totalExpenses.divide(BigDecimal.valueOf(customers.size()),
-                    2, RoundingMode.CEILING);
-        } else {
+        if (totalExpenses.equals(BigDecimal.ZERO)) {
             avgExpenses = BigDecimal.ZERO;
+        } else {
+            avgExpenses = totalExpenses.divide(BigDecimal.valueOf(customersMap.size()),
+                    2, RoundingMode.CEILING);
         }
 
         StatResult result = new StatResult();
-        result.setType("stat");
+        result.setType();
         result.setTotalDays(totalDays);
         result.setCustomers(customersList);
         result.setTotalExpenses(totalExpenses);
         result.setAvgExpenses(avgExpenses);
 
+        Path path = Paths.get(outputFilePath);
         try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             bw.write(JsonUtil.writeJson(result));
         } catch (IOException e) {
